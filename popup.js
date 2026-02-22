@@ -140,4 +140,20 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         })
     })
+
+    //handling stop button
+    stopBtn.addEventListener('click', ()=>{
+        console.log("stop button is clicked");
+        //confirm 
+        if(confirm("⚠️ Stop this session?\n\nProgress will not be saved.")){
+            chrome.runtime.sendMessage({action: 'stopSession'}, (response)=>{
+                console.log("session is stopped")
+
+                //back to setup 
+                setupView();
+            })
+        }
+    })
+
+    
 })
