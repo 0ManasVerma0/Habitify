@@ -18,6 +18,36 @@ const progress = document.getElementById("progressText")
 const siteName = document.getElementById("siteName")
 const progressFill = document.getElementById("progressFill")
 
+//fucntion for showing setup view
+function showSetupView(){
+    console.log("showing setup window");
+    setupView.classList.remove("hidden")
+    activeView.classList.add("hidden")
+    completedView.classList.add("hidden")
+}
+
+//function for showing active view
+function showActiveView(){
+    console.log("showing active window");
+    activeView.classList.remove("hidden")
+    setupView.classList.add("hidden")
+    completedView.classList.add("hidden")
+
+    //update display with session data
+    if(sessionData.allowedUrl){
+        siteName.text = sessionData.allowedUrl;
+    }
+}
+
+//fucntion for showing completed window
+function showCompletedView(){
+    console.log("showing completed window")
+    completedView.classList.remove("hidden")
+    activeView.classList.add("hidden")
+    setupView.classList.add("hidden")
+}
+
+//function for loading saved settings
 function loadSavedSettings(){
     //using chrome storage API for storing the settings locally 
     chrome.storage.local.get(["HabitSettings"], (result)=>{
@@ -39,6 +69,7 @@ function loadSavedSettings(){
     })
 }
 
+//function for checkin session status
 function checkSessionStatus(){
     //using chrome storage api for checking the status 
     chrome.runtime.sendMessage({action: 'getStatus'}, (response)=> {
@@ -61,5 +92,4 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("popup opened")
     loadSavedSettings();
     checkSessionStatus();
-    
 })
