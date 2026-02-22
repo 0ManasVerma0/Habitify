@@ -18,30 +18,6 @@ chrome.runtime.onInstalled.addListener(() => {
     })
     console.log("Default storage initialized")
 })
-//fucn for blocking the websites
-function blockNonAllowedTabs() {
-    if (!sessionActive) {
-        console.log("no session is active, no blocking")
-        return;
-    }
-
-    console.log("checking all the tabs")
-    //get all open tabs using loop
-    chrome.tabs.query({}, (tabs) => {
-        tabs.forEach((tab) => {
-            if (tab.url && !allowedUrl(tab.url)) {
-                console.log("tab blocked");
-                //redirecting to blocked html page
-                chrome.tabs.update(tab.id, {
-                    url: chrome.runtime.getURL('blocked.html')
-                })
-            }
-        });
-    })
-
-    //check in every 2 seconds
-    setTimeout(blockNonAllowedTabs, 2000);
-}
 
 // url checker
 function isAllowedUrl(url) {
@@ -66,6 +42,31 @@ function isAllowedUrl(url) {
         console.error('Error checking URL:', e);
         return false;
     }
+}
+
+//fucn for blocking the websites
+function blockNonAllowedTabs() {
+    if (!sessionActive) {
+        console.log("no session is active, no blocking")
+        return;
+    }
+
+    console.log("checking all the tabs")
+    //get all open tabs using loop
+    chrome.tabs.query({}, (tabs) => {
+        tabs.forEach((tab) => {
+            if (tab.url && !isAllowedUrl(tab.url)) {
+                console.log("tab blocked");
+                //redirecting to blocked html page
+                chrome.tabs.update(tab.id, {
+                    url: chrome.runtime.getURL('blocked.html')
+                })
+            }
+        });
+    })
+
+    //check in every 2 seconds
+    setTimeout(blockNonAllowedTabs, 2000);
 }
 
 //check for new tabs
@@ -141,10 +142,10 @@ function completeSession() {
     //calculate current streak data
     chrome.storage.local.get(['completedDays', 'currentStreak'], (data) => {
         let completedDays = data.completedDays || [];
-        let currentStreak = data.currentStreak || 0;
+        let streak = data.currentStreak || 0;
 
-        console.log("Completed streak is: ", completedDays)
-        console.log("Current streak is: ", currentStreak)
+        console.log("Completed streak is: ", streak)
+        console.log("Current streak is: ", completedDays)
 
         //check if today's session is done
         if (!completedDays.includes(today)) {
