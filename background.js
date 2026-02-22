@@ -139,7 +139,7 @@ function completeSession() {
     console.log("session completed successfully");
     const today = new Date().toDateString();
     //calculate current streak data
-    chrome.storage.local.get(['completedDays', 'currentStreak'], (date) => {
+    chrome.storage.local.get(['completedDays', 'currentStreak'], (data) => {
         let completedDays = data.completedDays || [];
         let currentStreak = data.currentStreak || 0;
 
