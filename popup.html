@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habitify</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="popup-container">
+        <!-- header - will appear on all the screens -->
+        <div class="header">
+            <div class="icon">🎯</div>
+            <h1>Habitify</h1>
+        </div>
+
+        <!-- screen-1 : setup screen -->
+        <div id="setupView" class="view">
+            <div class="form-group">
+                <label>Focus Website</label>
+                <input type="text" id="websiteUrl" placeholder="eg. duolingo.com">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Start Time</label>
+                    <input type="time" id="startTime" value="20:00">
+                </div>
+
+                <div class="form-group">
+                    <label>Duration</label>
+                    <input type="number" id="duration" value="60" min="5" max="180">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Number of Days</label>
+                <input type="number" id="totalDays" value="21" min="1" max="365">
+            </div>
+
+            <button id="startBtn" class="btn btn-primary">
+                Start Habitify
+            </button>
+        </div>
+
+        <!-- screen-2 : active screen  -->
+        <div id="activeView" class="view hidden">
+            <!-- timer card  -->
+            <div class="timer-card">
+                <div class="timer-display" id="timer">42:15</div>
+                <div class="site-name" id="siteName">duolingo.com</div>
+            </div>
+            <!-- streak card  -->
+            <div class="streak-card">
+                <div class="streak-emoji">🔥</div>
+                <div class="streak-display" id="streakNumber">7</div>
+                <div class="streak-label">Day Streak</div>
+            </div>
+            <!-- progress bar  -->
+            <div class="progress-bar">
+                <div class="progress-text" id="progressText">7 / 21 days</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 33%"></div>
+                </div>
+            </div>
+
+            <button id="stopBtn" class="btn btn-danger">
+                End Session Early
+            </button>
+        </div>
+
+        <!-- screen-3 : session completed  -->
+        <div id="completeView" class="view hidden">
+            <div class="success-card">
+                <div class="success-emoji">🎉</div>
+                <h2>Session Complete!</h2>
+            </div>
+
+            <div class="streak-card">
+                <div class="streak-emoji">🔥</div>
+                <div class="streak-number" id="completeStreakNumber">8</div>
+                <div class="streak-label">Day Streak</div>
+            </div>
+
+            <div class="progress-card">
+                <div class="progress-text" id="completeProgressText">8 / 21 days</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 38%"></div>
+                </div>
+            </div>
+
+            <button id="viewStatsBtn" class="btn btn-primary">
+                View Statistics
+            </button>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>

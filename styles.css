@@ -1,0 +1,235 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Main popup window */
+body {
+  width: 320px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f5f1e8;
+}
+
+/* Container with sketch border */
+.popup-container {
+  background: white;
+  border: 3px solid #2a2a2a;
+  border-radius: 12px;
+  box-shadow: 
+    4px 4px 0 rgba(0,0,0,0.1),
+    0 0 0 1px #3a3a3a;
+  overflow: hidden;
+}
+
+/* Purple gradient header */
+.header {
+  background: linear-gradient(135deg, #9b8fd8 0%, #b8a5e8 100%);
+  padding: 20px;
+  text-align: center;
+  border-bottom: 3px solid #333;
+}
+
+.header .icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.header h1 {
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+}
+
+/* View container */
+.view {
+  padding: 20px;
+}
+
+/* Hide class */
+.hidden {
+  display: none !important;
+}
+
+/* Form styling */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #333;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.05);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #9b8fd8;
+  box-shadow: 2px 2px 0 rgba(155,143,216,0.2);
+}
+
+.form-group small {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Two inputs side by side */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: 3px solid #333;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+  transition: transform 0.1s;
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 rgba(0,0,0,0.15);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #9b8fd8 0%, #b8a5e8 100%);
+  color: white;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ff9b9b 0%, #ffb5b5 100%);
+  color: #8b2020;
+}
+
+/* Timer Card */
+.timer-card {
+  background: linear-gradient(135deg, #c8bfec 0%, #d9d1f5 100%);
+  border: 3px solid #333;
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 16px;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+}
+
+.timer-display {
+  font-size: 48px;
+  font-weight: bold;
+  color: #2a2a2a;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.site-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #555;
+}
+
+/* Streak Card */
+.streak-card {
+  background: linear-gradient(135deg, #ffc470 0%, #ffd89b 100%);
+  border: 3px solid #333;
+  border-radius: 10px;
+  padding: 18px;
+  text-align: center;
+  margin-bottom: 16px;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+}
+
+.streak-emoji {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.streak-number {
+  font-size: 36px;
+  font-weight: bold;
+  color: #2a2a2a;
+  line-height: 1;
+}
+
+.streak-label {
+  font-size: 13px;
+  font-weight: bold;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* Progress Card */
+.progress-card {
+  background: #f9f7f0;
+  border: 2px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.progress-text {
+  font-size: 12px;
+  font-weight: bold;
+  color: #555;
+  text-align: right;
+  margin-bottom: 8px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: #e0ddd0;
+  border: 2px solid #333;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #9b8fd8 0%, #b8a5e8 100%);
+  transition: width 0.5s ease;
+}
+
+/* Success Card */
+.success-card {
+  background: white;
+  border: 3px solid #333;
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 16px;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+}
+
+.success-emoji {
+  font-size: 56px;
+  margin-bottom: 12px;
+}
+
+.success-card h2 {
+  font-size: 20px;
+  color: #333;
+  margin: 0;
+}
