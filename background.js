@@ -18,6 +18,39 @@ chrome.runtime.onInstalled.addListener(()=>{
     })
     console.log("Default storage initialized")
 })
+//func for starting a session
+function startSession(){
+    console.log("starting session now")
+    sessionActive = true;
+    allowedUrl = habitSettings.websiteUrl || '';
+    sessionEndTime = Date.now() + (habitSettings.duration * 60 * 100);
+
+    //saving in storage
+    chrome.storage.local.set({sessionActive: true});
+    console.log("session started")
+    console.log("allowed website: ", allowedUrl)
+    console.log("session ends at: ", new Date(sessionEndTime).toLocaleTimeString());
+
+    //creating alarm when session should end
+    chrome.alarms.create('sessionEnd', {
+        when: sessionEndTime
+    })
+
+    //block other websites
+    blockNonAllowedTabs();
+}
+
+//func for stopping a session
+function stopSession(){
+    console.log("stopping this session")
+    sessionActive = false;
+    allowedUrl = '';
+    sessionEndTime = null;
+    chrome.storage.local.set({sessionActive: false}) //update in local storage
+    //clear the alarm
+    chrome.alarms.clear('sessionEnd');
+    console.log("session is stopped")
+}
 
 //func for starting habit schedule
 function startHabitSchedule(settings){
