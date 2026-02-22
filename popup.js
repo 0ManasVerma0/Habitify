@@ -20,10 +20,16 @@ const progressFill = document.getElementById("progressFill")
 
 //global variable for session data
 let sessionData = {};
+let timerInterval = null; // variable to store timer interval
 
 //fucntion for showing setup view
 function showSetupView(){
     console.log("showing setup window");
+    //clear timer if it's running
+    if(timerInterval){
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
     setupView.classList.remove("hidden")
     activeView.classList.add("hidden")
     completedView.classList.add("hidden")
@@ -40,11 +46,66 @@ function showActiveView(){
     if(sessionData.allowedUrl){
         siteName.textContent = sessionData.allowedUrl;
     }
+
+    //start the timer
+    startTimer();
+}
+
+//function to update timer display
+function updateTimer(){
+    if(!sessionData.endTime){
+        console.log("No session end time available");
+        return;
+    }
+
+    const now = Date.now();
+    const timeRemaining = Math.max(0, sessionData.endTime - now); //remaining time in ms
+
+    //convert ms to mm:ss format
+    const minutes = Math.floor(timeRemaining / 60000);
+    const seconds = Math.floor((timeRemaining % 60000) / 1000);
+
+    const displayTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    timer.textContent = displayTime;
+
+    //update progress bar
+    if(sessionData.settings && sessionData.settings.duration){
+        const totalDuration = sessionData.settings.duration * 60 * 1000; //in milliseconds
+        const elapsed = totalDuration - timeRemaining;
+        const progressPercent = Math.min(100, (elapsed / totalDuration) * 100);
+        progressFill.style.width = progressPercent + '%';
+        progress.textContent = `${Math.floor(progressPercent)}% complete`;
+    }
+
+    //if time is up, stop the timer
+    if(timeRemaining <= 0){
+        clearInterval(timerInterval);
+        console.log("Session time is up!");
+    }
+}
+
+//function to start the timer interval
+function startTimer(){
+    //clear any existing interval
+    if(timerInterval){
+        clearInterval(timerInterval);
+    }
+
+    //update immediately
+    updateTimer();
+
+    //then update every 1 second
+    timerInterval = setInterval(updateTimer, 1000);
 }
 
 //fucntion for showing completed window
 function showCompletedView(){
     console.log("showing completed window")
+    //clear timer if it's running
+    if(timerInterval){
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
     completedView.classList.remove("hidden")
     activeView.classList.add("hidden")
     setupView.classList.add("hidden")
