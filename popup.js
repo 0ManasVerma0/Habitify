@@ -92,4 +92,52 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("popup opened")
     loadSavedSettings();
     checkSessionStatus();
+
+    //handling start button
+    startBtn.addEventListener('click', ()=>{
+        console.log("start button is clicked")
+
+        const settings = {
+            websiteUrl : websiteUrl.value.trime(),
+            startTime : startTime.value,
+            duration : parseInt(duration.value),
+            totalDays : parseInt(totalDays.value)
+        };
+
+        console.log("settings: ", settings)
+
+        //validate the inputs
+        if(!settings.websiteUrl){
+            alert("⚠️ Please enter a website URL!")
+            return
+        }
+        if(settings.startTime < 0 || settings.startTime > 180){
+            alert("⚠️ Duration must be between 5 and 180 minutes!")
+            return
+        }
+        if(settings.duration < 0 || settings.duration > 365){
+            alert("⚠️ Duration must be between 5 and 180 minutes!")
+            return
+        }
+        if(settings.totalDays < 0 || settings.totalDays > 365){
+            alert("⚠️ Total days must be between 1 and 365!")
+            return
+        }
+
+        //save settings to chrome storage api
+        chrome.storage.local.set({HabitSettings: settings}, ()=>{
+            console.log("setting saved!")
+            //send msg to background script to start the schedule
+            chrome.runtime.sendMessage({
+                action: 'startSchedule',
+                settings: settings
+            }, (response) => {
+                console.log("schedule started:", response);
+                //show success message
+                alert(`✅ Habit scheduled!\n\nSession will start at ${settings.startTime} every day for ${settings.totalDays} days.`)
+
+                window.close(); //popup will be closed
+            })
+        })
+    })
 })
