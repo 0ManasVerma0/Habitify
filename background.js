@@ -18,6 +18,7 @@ chrome.runtime.onInstalled.addListener(()=>{
     })
     console.log("Default storage initialized")
 })
+
 //func for starting a session
 function startSession(){
     console.log("starting session now")
@@ -100,7 +101,19 @@ function completeSession(){
     stopSession();
 }
 
+//listening to the alarms
+chrome.alarms.onAlarm.addListener((alarm) =>{
+    console.log("alarm triggerd: ", alarm.name);
 
+    if(alarm.name === 'dailyHabitStart'){
+        console.log("daily habit time started")
+        startSession();
+    }
+    else if(alarm.name === 'sessionEnd'){
+        console.log("Session ended")
+        completeSession();
+    }
+})
 
 //func for starting habit schedule
 function startHabitSchedule(settings){
