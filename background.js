@@ -14,7 +14,8 @@ chrome.runtime.onInstalled.addListener(() => {
         sessionActive: false,
         currentStreak: 0,
         completedDays: [],
-        habitSettings: {}
+        habitSettings: {},
+        sessionJustCompleted: false
     })
     console.log("Default storage initialized")
 })
@@ -140,9 +141,10 @@ function completeSession() {
     console.log("session completed successfully");
     const today = new Date().toDateString();
     //calculate current streak data
-    chrome.storage.local.get(['completedDays', 'currentStreak'], (data) => {
+    chrome.storage.local.get(['completedDays', 'currentStreak', 'habitSettings'], (data) => {
         let completedDays = data.completedDays || [];
         let streak = data.currentStreak || 0;
+        const totalDays = data.habitSettings?.totalDays || 21;
 
         console.log("Completed streak is: ", streak)
         console.log("Current streak is: ", completedDays)
@@ -170,7 +172,9 @@ function completeSession() {
             //save updated data
             chrome.storage.local.set({
                 completedDays: completedDays,
-                currentStreak: streak
+                currentStreak: streak,
+                sessionJustCompleted: true,
+                completedProgressText: `${completedDays.length} / ${totalDays} days`
             })
             console.log("Progress saved")
         }

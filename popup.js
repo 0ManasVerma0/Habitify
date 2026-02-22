@@ -5,7 +5,7 @@ const completedView = document.getElementById("completeView")
 //buttons
 const startBtn = document.getElementById("startBtn")
 const stopBtn = document.getElementById("stopBtn")
-const viewStatsBtn = document.getElementById("viewStatsBtn")
+const continueBtn = document.getElementById("continueBtn")
 //form inputs (setup view)
 const websiteUrl = document.getElementById("websiteUrl")
 const startTime = document.getElementById("startTime")
@@ -48,6 +48,9 @@ function showCompletedView(){
     completedView.classList.remove("hidden")
     activeView.classList.add("hidden")
     setupView.classList.add("hidden")
+    
+    // Clear the completion flag so it doesn't show again
+    chrome.storage.local.set({ sessionJustCompleted: false });
 }
 
 //function for loading saved settings
@@ -74,19 +77,36 @@ function loadSavedSettings(){
 
 //function for checkin session status
 function checkSessionStatus(){
-    //using chrome storage api for checking the status 
-    chrome.runtime.sendMessage({action: 'getStatus'}, (response)=> {
-        console.log("session staus: ", response)
+    // Check if session just completed
+    chrome.storage.local.get(['sessionJustCompleted'], (result) => {
+        if(result.sessionJustCompleted){
+            // Get the session data to display in completedView
+            chrome.storage.local.get(['currentStreak', 'completedProgressText'], (data) => {
+                if(data.currentStreak !== undefined){
+                    document.getElementById('completeStreakNumber').textContent = data.currentStreak;
+                }
+                if(data.completedProgressText){
+                    document.getElementById('completeProgressText').textContent = data.completedProgressText;
+                }
+                showCompletedView();
+            })
+            return;
+        }
+        
+        //using chrome storage api for checking the status 
+        chrome.runtime.sendMessage({action: 'getStatus'}, (response)=> {
+            console.log("session staus: ", response)
 
-        //IF ACTIVE SESSION
-        if(response && response.active){
-            sessionData = response; //store session data
-            showActiveView() //show active view
-        }
-        else{
-            //show setup view
-            showSetupView();
-        }
+            //IF ACTIVE SESSION
+            if(response && response.active){
+                sessionData = response; //store session data
+                showActiveView() //show active view
+            }
+            else{
+                //show setup view
+                showSetupView();
+            }
+        })
     })
 }
 
@@ -153,17 +173,17 @@ document.addEventListener('DOMContentLoaded', () => {
             chrome.runtime.sendMessage({action: 'stopSession'}, (response)=>{
                 console.log("session is stopped")
 
-                //back to setup 
-                showSetupView();
+                //show completed view
+                showCompletedView();
             })
         }
     })
 
-    //handling stats button
-    viewStatsBtn.addEventListener('click', ()=>{
-        console.log("stats button clicked")
+    //handling continue button (back to setup from completed view)
+    continueBtn.addEventListener('click', ()=>{
+        console.log("continue button clicked")
 
-        //for now redirecting to setup window
+        //go back to setup window
         showSetupView();
     })
 })
