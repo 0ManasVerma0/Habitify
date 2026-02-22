@@ -52,6 +52,56 @@ function stopSession(){
     console.log("session is stopped")
 }
 
+//func for completing a session
+function completeSession(){
+    console.log("session completed successfully");
+    const today = new Date().toDateString();
+    //calculate current streak data
+    chrome.storage.local.get(['completedDays', 'currentStreak'], (date) =>{
+        let completedDays = data.completedDays || [];
+        let currentStreak = data.currentStreak || 0;
+
+        console.log("Completed streak is: ", completedDays)
+        console.log("Current streak is: ", currentStreak)
+
+        //check if today's session is done
+        if(!completedDays.includes(today)){
+            completedDays.push(today);
+
+            //calculate streak
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1)
+            const yesterdayStr = yesterday.toDateString();
+
+            //if yesterday is completed or first day 
+            if(completedDays.includes(yesterdayStr) || streak === 0){
+                streak++;
+                console.log("streak increased to: " ,streak)
+            }
+            else{
+                //streak broken
+                streak = 1;
+                console.log("streak broken, set to 1")
+            }
+
+            //save updated data
+            chrome.storage.local.set({
+                completedDays : completedDays,
+                currentStreak: streak
+            })
+            console.log("Progress saved")
+        }
+        else{
+            console.log("already completed today")
+        }
+    })
+
+    //stop session
+    stopSession();
+}
+
+
+
 //func for starting habit schedule
 function startHabitSchedule(settings){
     console.log("starting habit schedule");
