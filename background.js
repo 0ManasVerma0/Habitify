@@ -6,7 +6,7 @@ let habitSettings = {};
 console.log("background script started")
 
 //this starts right after extension is installed
-chrome.runtime.onInstalled.addListener(()=>{
+chrome.runtime.onInstalled.addListener(() => {
     console.log("Succesfully Installed");
 
     //initialize storage
@@ -19,8 +19,8 @@ chrome.runtime.onInstalled.addListener(()=>{
     console.log("Default storage initialized")
 })
 //fucn for blocking the websites
-function blockNonAllowedTabs(){
-    if(!sessionActive){
+function blockNonAllowedTabs() {
+    if (!sessionActive) {
         console.log("no session is active, no blocking")
         return;
     }
@@ -29,7 +29,7 @@ function blockNonAllowedTabs(){
     //get all open tabs using loop
     chrome.tabs.query({}, (tabs) => {
         tabs.forEach((tab) => {
-            if(tab.url && !allowedUrl(tab.url)){
+            if (tab.url && !allowedUrl(tab.url)) {
                 console.log("tab blocked");
                 //redirecting to blocked html page
                 chrome.tabs.update(tab.id, {
@@ -44,39 +44,71 @@ function blockNonAllowedTabs(){
 }
 
 // url checker
-function isAllowedUrl(url){
+function isAllowedUrl(url) {
     //always allow extension pages
-    if(url.startsWith('chrome://') || url.startsWith('chrome-extension://') || url === 'about:blank'){
+    if (url.startsWith('chrome://') || url.startsWith('chrome-extension://') || url === 'about:blank') {
         return true;
     }
 
     //check if url is allowed
     try {
-    const urlLower = url.toLowerCase();
-    const allowedLower = allowedUrl.toLowerCase();
-    
-    const isAllowed = urlLower.includes(allowedLower);
-    
-    if (isAllowed) {
-      console.log('✅ Allowed:', url);
+        const urlLower = url.toLowerCase();
+        const allowedLower = allowedUrl.toLowerCase();
+
+        const isAllowed = urlLower.includes(allowedLower);
+
+        if (isAllowed) {
+            console.log('✅ Allowed:', url);
+        }
+
+        return isAllowed;
+    } catch (e) {
+        console.error('Error checking URL:', e);
+        return false;
     }
-    
-    return isAllowed;
-  } catch (e) {
-    console.error('Error checking URL:', e);
-    return false;
-  }
 }
 
+//check for new tabs
+chrome.tabs.onCreated.addListener((tab) => {
+    if (sessionActive) {
+        console.log("new tab created")
+
+        //waiting for url to load
+        setTimeout(() => {
+            chrome.tabs.get(tab.id, (updatedTab) => {
+                if (updatedTab.url && !isAllowedUrl(updatedTab.url)) {
+                    console.log('🚫 Blocking new tab');
+                    chrome.tabs.update(tab.id, {
+                        url: chrome.runtime.getURL('blocked.html')
+                    });
+                }
+            });
+        }, 100);
+    }
+})
+//user changes the tab url (navigating)
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (sessionActive && changeInfo.url) {
+    console.log('🔄 Tab URL changed:', changeInfo.url);
+    
+    if (!isAllowedUrl(changeInfo.url)) {
+      console.log('🚫 Blocking navigation');
+      chrome.tabs.update(tabId, {
+        url: chrome.runtime.getURL('blocked.html')
+      });
+    }
+  }
+});
+
 //func for starting a session
-function startSession(){
+function startSession() {
     console.log("starting session now")
     sessionActive = true;
     allowedUrl = habitSettings.websiteUrl || '';
     sessionEndTime = Date.now() + (habitSettings.duration * 60 * 100);
 
     //saving in storage
-    chrome.storage.local.set({sessionActive: true});
+    chrome.storage.local.set({ sessionActive: true });
     console.log("session started")
     console.log("allowed website: ", allowedUrl)
     console.log("session ends at: ", new Date(sessionEndTime).toLocaleTimeString());
@@ -91,23 +123,23 @@ function startSession(){
 }
 
 //func for stopping a session
-function stopSession(){
+function stopSession() {
     console.log("stopping this session")
     sessionActive = false;
     allowedUrl = '';
     sessionEndTime = null;
-    chrome.storage.local.set({sessionActive: false}) //update in local storage
+    chrome.storage.local.set({ sessionActive: false }) //update in local storage
     //clear the alarm
     chrome.alarms.clear('sessionEnd');
     console.log("session is stopped")
 }
 
 //func for completing a session
-function completeSession(){
+function completeSession() {
     console.log("session completed successfully");
     const today = new Date().toDateString();
     //calculate current streak data
-    chrome.storage.local.get(['completedDays', 'currentStreak'], (date) =>{
+    chrome.storage.local.get(['completedDays', 'currentStreak'], (date) => {
         let completedDays = data.completedDays || [];
         let currentStreak = data.currentStreak || 0;
 
@@ -115,7 +147,7 @@ function completeSession(){
         console.log("Current streak is: ", currentStreak)
 
         //check if today's session is done
-        if(!completedDays.includes(today)){
+        if (!completedDays.includes(today)) {
             completedDays.push(today);
 
             //calculate streak
@@ -124,11 +156,11 @@ function completeSession(){
             const yesterdayStr = yesterday.toDateString();
 
             //if yesterday is completed or first day 
-            if(completedDays.includes(yesterdayStr) || streak === 0){
+            if (completedDays.includes(yesterdayStr) || streak === 0) {
                 streak++;
-                console.log("streak increased to: " ,streak)
+                console.log("streak increased to: ", streak)
             }
-            else{
+            else {
                 //streak broken
                 streak = 1;
                 console.log("streak broken, set to 1")
@@ -136,12 +168,12 @@ function completeSession(){
 
             //save updated data
             chrome.storage.local.set({
-                completedDays : completedDays,
+                completedDays: completedDays,
                 currentStreak: streak
             })
             console.log("Progress saved")
         }
-        else{
+        else {
             console.log("already completed today")
         }
     })
@@ -151,24 +183,24 @@ function completeSession(){
 }
 
 //listening to the alarms
-chrome.alarms.onAlarm.addListener((alarm) =>{
+chrome.alarms.onAlarm.addListener((alarm) => {
     console.log("alarm triggerd: ", alarm.name);
 
-    if(alarm.name === 'dailyHabitStart'){
+    if (alarm.name === 'dailyHabitStart') {
         console.log("daily habit time started")
         startSession();
     }
-    else if(alarm.name === 'sessionEnd'){
+    else if (alarm.name === 'sessionEnd') {
         console.log("Session ended")
         completeSession();
     }
 })
 
 //func for starting habit schedule
-function startHabitSchedule(settings){
+function startHabitSchedule(settings) {
     console.log("starting habit schedule");
     habitSettings = settings; //saves settings globally
-    chrome.storage.local.set({habitSettings: settings}); //saves it to storage locally using chrome storage api
+    chrome.storage.local.set({ habitSettings: settings }); //saves it to storage locally using chrome storage api
 
     //calculating next session start 
     const now = new Date();
@@ -181,7 +213,7 @@ function startHabitSchedule(settings){
     console.log("Time for next Session: ", nextSession.toLocaleTimeString());
 
     //if time is passed schedule it for next dat
-    if(nextSession <= now){
+    if (nextSession <= now) {
         console.log("time passed for today, scheduling it to tomorrow");
         nextSession.setDate(nextSession.getDate() + 1)
     }
@@ -195,7 +227,7 @@ function startHabitSchedule(settings){
     console.log("Alarm created")
 
     const timeDiff = Math.abs(nextSession - now)
-    if(timeDiff < 60000){//less than 1 min
+    if (timeDiff < 60000) {//less than 1 min
         console.log("starting session now");
         startSession();
     }
@@ -206,7 +238,7 @@ function startHabitSchedule(settings){
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("msg recieved: ", request.action)
 
-    if(request.action === 'getStatus'){
+    if (request.action === 'getStatus') {
         //popup asks if a session is active
         sendResponse({
             active: sessionActive,
@@ -215,15 +247,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             settings: habitSettings
         })
     }
-    else if(request.action === 'startSchedule'){
+    else if (request.action === 'startSchedule') {
         //popup asks to start a habit schedule
         startHabitSchedule(request.settings);
-        sendResponse({success: true});
+        sendResponse({ success: true });
     }
-    else if(request.action === 'stopSession'){
+    else if (request.action === 'stopSession') {
         //popup asks to stop the session
         stopSession();
-        sendResponse({success: true});
+        sendResponse({ success: true });
     }
 
     return true;
