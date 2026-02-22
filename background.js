@@ -106,7 +106,7 @@ function startSession() {
     console.log("starting session now")
     sessionActive = true;
     allowedUrl = habitSettings.websiteUrl || '';
-    sessionEndTime = Date.now() + (habitSettings.duration * 60 * 100);
+    sessionEndTime = Date.now() + (habitSettings.duration * 60 * 1000);
 
     //saving in storage
     chrome.storage.local.set({ sessionActive: true });

@@ -18,6 +18,9 @@ const progress = document.getElementById("progressText")
 const siteName = document.getElementById("siteName")
 const progressFill = document.getElementById("progressFill")
 
+//global variable for session data
+let sessionData = {};
+
 //fucntion for showing setup view
 function showSetupView(){
     console.log("showing setup window");
@@ -35,7 +38,7 @@ function showActiveView(){
 
     //update display with session data
     if(sessionData.allowedUrl){
-        siteName.text = sessionData.allowedUrl;
+        siteName.textContent = sessionData.allowedUrl;
     }
 }
 
@@ -50,11 +53,11 @@ function showCompletedView(){
 //function for loading saved settings
 function loadSavedSettings(){
     //using chrome storage API for storing the settings locally 
-    chrome.storage.local.get(["HabitSettings"], (result)=>{
+    chrome.storage.local.get(["habitSettings"], (result)=>{
         console.log("Loading saved settings:", result)
 
-        if(result.HabitSettings){
-            const settings = result.HabitSettings;
+        if(result.habitSettings){
+            const settings = result.habitSettings;
 
             if(settings.websiteUrl) websiteUrl.value = settings.websiteUrl;
             if(settings.startTime) startTime.value = settings.startTime;
@@ -77,7 +80,8 @@ function checkSessionStatus(){
 
         //IF ACTIVE SESSION
         if(response && response.active){
-            showActiveView(response) //show active view
+            sessionData = response; //store session data
+            showActiveView() //show active view
         }
         else{
             //show setup view
@@ -111,11 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("⚠️ Please enter a website URL!")
             return
         }
-        if(settings.startTime < 0 || settings.startTime > 180){
-            alert("⚠️ Duration must be between 5 and 180 minutes!")
+        if(!settings.startTime){
+            alert("⚠️ Please enter a start time!")
             return
         }
-        if(settings.duration < 0 || settings.duration > 365){
+        if(settings.duration < 5 || settings.duration > 180){
             alert("⚠️ Duration must be between 5 and 180 minutes!")
             return
         }
@@ -125,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         //save settings to chrome storage api
-        chrome.storage.local.set({HabitSettings: settings}, ()=>{
+        chrome.storage.local.set({habitSettings: settings}, ()=>{
             console.log("setting saved!")
             //send msg to background script to start the schedule
             chrome.runtime.sendMessage({
@@ -150,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log("session is stopped")
 
                 //back to setup 
-                setupView();
+                showSetupView();
             })
         }
     })
