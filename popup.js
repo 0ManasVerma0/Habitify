@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("start button is clicked")
 
         const settings = {
-            websiteUrl : websiteUrl.value.trime(),
+            websiteUrl : websiteUrl.value.trim(),
             startTime : startTime.value,
             duration : parseInt(duration.value),
             totalDays : parseInt(totalDays.value)
@@ -155,5 +155,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
 
-    
+    //handling stats button
+    viewStatsBtn.addEventListener('click', ()=>{
+        console.log("stats button clicked")
+
+        //for now redirecting to setup window
+        showSetupView();
+    })
 })
