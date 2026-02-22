@@ -17,3 +17,10 @@ const streakNumber = document.getElementById("streakNumber")
 const progress = document.getElementById("progressText")
 const siteName = document.getElementById("siteName")
 const progressFill = document.getElementById("progressFill")
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("popup opened")
+    loadSavedSettings();
+    checkSessionStatus();
+    
+})
