@@ -18,6 +18,55 @@ chrome.runtime.onInstalled.addListener(()=>{
     })
     console.log("Default storage initialized")
 })
+//fucn for blocking the websites
+function blockNonAllowedTabs(){
+    if(!sessionActive){
+        console.log("no session is active, no blocking")
+        return;
+    }
+
+    console.log("checking all the tabs")
+    //get all open tabs using loop
+    chrome.tabs.query({}, (tabs) => {
+        tabs.forEach((tab) => {
+            if(tab.url && !allowedUrl(tab.url)){
+                console.log("tab blocked");
+                //redirecting to blocked html page
+                chrome.tabs.update(tab.id, {
+                    url: chrome.runtime.getURL('blocked.html')
+                })
+            }
+        });
+    })
+
+    //check in every 2 seconds
+    setTimeout(blockNonAllowedTabs, 2000);
+}
+
+// url checker
+function isAllowedUrl(url){
+    //always allow extension pages
+    if(url.startsWith('chrome://') || url.startsWith('chrome-extension://') || url === 'about:blank'){
+        return true;
+    }
+
+    //check if url is allowed
+    try {
+    const urlLower = url.toLowerCase();
+    const allowedLower = allowedUrl.toLowerCase();
+    
+    const isAllowed = urlLower.includes(allowedLower);
+    
+    if (isAllowed) {
+      console.log('✅ Allowed:', url);
+    }
+    
+    return isAllowed;
+  } catch (e) {
+    console.error('Error checking URL:', e);
+    return false;
+  }
+}
 
 //func for starting a session
 function startSession(){
