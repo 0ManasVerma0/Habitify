@@ -21,13 +21,13 @@ A Chrome extension that helps you build lasting habits by blocking distracting w
 ## 📦 Installation
 
 ### Manual Installation (Developer Mode)
-1. Download the zip of this repository
-2. Open Chrome and go to `chrome://extensions/`
+1. Download the zip of this repository and unzip the file
+2. Open Chrome and go to `chrome://extensions/` (you can do it in any browser, you jus have to find its extensions)
 3. Enable "Developer mode" (toggle in top-right)
 4. Click "Load unpacked"
 5. Select the `habitify` folder
 6. Done! Click the extension icon to start
-7. Make sure to turn on background sync from extension settings
+7. Make sure to turn on background sync from extension's settings
 
 ## 🎮 Usage
 
