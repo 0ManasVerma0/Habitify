@@ -21,7 +21,7 @@ A Chrome extension that helps you build lasting habits by blocking distracting w
 ## 📦 Installation
 
 ### Manual Installation (Developer Mode)
-1. Download the latest release
+1. Download the zip of this repository
 2. Open Chrome and go to `chrome://extensions/`
 3. Enable "Developer mode" (toggle in top-right)
 4. Click "Load unpacked"
