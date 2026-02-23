@@ -90,38 +90,48 @@ chrome.tabs.onCreated.addListener((tab) => {
 })
 //user changes the tab url (navigating)
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (sessionActive && changeInfo.url) {
-    console.log('🔄 Tab URL changed:', changeInfo.url);
-    
-    if (!isAllowedUrl(changeInfo.url)) {
-      console.log('🚫 Blocking navigation');
-      chrome.tabs.update(tabId, {
-        url: chrome.runtime.getURL('blocked.html')
-      });
+    if (sessionActive && changeInfo.url) {
+        console.log('🔄 Tab URL changed:', changeInfo.url);
+
+        if (!isAllowedUrl(changeInfo.url)) {
+            console.log('🚫 Blocking navigation');
+            chrome.tabs.update(tabId, {
+                url: chrome.runtime.getURL('blocked.html')
+            });
+        }
     }
-  }
 });
 
 //func for starting a session
 function startSession() {
     console.log("starting session now")
     sessionActive = true;
-    allowedUrl = habitSettings.websiteUrl || '';
-    sessionEndTime = Date.now() + (habitSettings.duration * 60 * 1000);
+    ensureHabitSettings((settings) => {
+        allowedUrl = settings.websiteUrl || '';
+        //this prevents returning a NaN output 
+        const durationMinutes = Number(settings.duration);
+        if (!Number.isFinite(durationMinutes) || durationMinutes <= 0) {
+            console.error("Invalid session duration:", settings.duration);
+            sessionActive = false;
+            chrome.storage.local.set({ sessionActive: false });
+            return;
+        }
+        sessionEndTime = Date.now() + (durationMinutes * 60 * 1000);
 
-    //saving in storage
-    chrome.storage.local.set({ sessionActive: true });
-    console.log("session started")
-    console.log("allowed website: ", allowedUrl)
-    console.log("session ends at: ", new Date(sessionEndTime).toLocaleTimeString());
+        //saving in storage
+        chrome.storage.local.set({ sessionActive: true });
+        console.log("session started")
+        console.log("allowed website: ", allowedUrl)
+        console.log("session ends at: ", new Date(sessionEndTime).toLocaleTimeString());
 
-    //creating alarm when session should end
-    chrome.alarms.create('sessionEnd', {
-        when: sessionEndTime
-    })
+        //creating alarm when session should end
+        chrome.alarms.create('sessionEnd', {
+            when: sessionEndTime
+        })
 
-    //block other websites
-    blockNonAllowedTabs();
+        //block other websites
+        blockNonAllowedTabs();
+    });
 }
 
 //func for stopping a session
@@ -237,6 +247,19 @@ function startHabitSchedule(settings) {
         startSession();
     }
 
+}
+
+//this will prevent the duration to be NaN and will always return a number
+function ensureHabitSettings(callback) {
+    const durationMinutes = Number(habitSettings.duration);
+    if (Number.isFinite(durationMinutes) && durationMinutes > 0) {
+        callback(habitSettings);
+        return;
+    }
+    chrome.storage.local.get(['habitSettings'], (data) => {
+        habitSettings = data.habitSettings || {};
+        callback(habitSettings);
+    });
 }
 
 //listen msg from popup window
