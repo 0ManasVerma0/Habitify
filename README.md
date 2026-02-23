@@ -99,7 +99,7 @@ Habitify respects your privacy:
 ![Active Session](screenshots/active.png)
 
 ### Session Complete
-![Complete](screenshots/complete.png)
+![Complete](screenshots/completed.png)
 
 ### Blocked Page
 ![Blocked](screenshots/blocked.png)
