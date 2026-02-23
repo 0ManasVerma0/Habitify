@@ -47,6 +47,8 @@ function showActiveView(){
         siteName.textContent = sessionData.allowedUrl;
     }
 
+    updateStreakAndProgress();
+
     //start the timer
     startTimer();
 }
@@ -74,7 +76,12 @@ function updateTimer(){
         const elapsed = totalDuration - timeRemaining;
         const progressPercent = Math.min(100, (elapsed / totalDuration) * 100);
         progressFill.style.width = progressPercent + '%';
-        progress.textContent = `${Math.floor(progressPercent)}% complete`;
+        const percentText = `${Math.floor(progressPercent)}% complete`;
+        if (sessionData.dayProgressText) {
+            progress.textContent = `${percentText} • ${sessionData.dayProgressText}`;
+        } else {
+            progress.textContent = percentText;
+        }
     }
 
     //if time is up, stop the timer
@@ -109,6 +116,8 @@ function showCompletedView(){
     completedView.classList.remove("hidden")
     activeView.classList.add("hidden")
     setupView.classList.add("hidden")
+
+    updateStreakAndProgress();
     
     // Clear the completion flag so it doesn't show again
     chrome.storage.local.set({ sessionJustCompleted: false });
@@ -141,16 +150,8 @@ function checkSessionStatus(){
     // Check if session just completed
     chrome.storage.local.get(['sessionJustCompleted'], (result) => {
         if(result.sessionJustCompleted){
-            // Get the session data to display in completedView
-            chrome.storage.local.get(['currentStreak', 'completedProgressText'], (data) => {
-                if(data.currentStreak !== undefined){
-                    document.getElementById('completeStreakNumber').textContent = data.currentStreak;
-                }
-                if(data.completedProgressText){
-                    document.getElementById('completeProgressText').textContent = data.completedProgressText;
-                }
-                showCompletedView();
-            })
+            updateStreakAndProgress();
+            showCompletedView();
             return;
         }
         
@@ -168,6 +169,28 @@ function checkSessionStatus(){
                 showSetupView();
             }
         })
+    })
+}
+
+//function for updating streak and progress
+function updateStreakAndProgress(){
+    chrome.storage.local.get(['currentStreak', 'completedDays', 'habitSettings', 'completedProgressText'], (data) => {
+        const streak = Number.isFinite(data.currentStreak) ? data.currentStreak : 0;
+        streakNumber.textContent = streak;
+
+        const totalDays = data.habitSettings?.totalDays || 0;
+        const doneDays = Array.isArray(data.completedDays) ? data.completedDays.length : 0;
+        sessionData.dayProgressText = totalDays > 0 ? `${doneDays} / ${totalDays} days` : `${doneDays} days`;
+
+        const completedStreakEl = document.getElementById('completeStreakNumber');
+        if (completedStreakEl) {
+            completedStreakEl.textContent = streak;
+        }
+
+        const completedProgressEl = document.getElementById('completeProgressText');
+        if (completedProgressEl) {
+            completedProgressEl.textContent = data.completedProgressText || sessionData.dayProgressText;
+        }
     })
 }
 
