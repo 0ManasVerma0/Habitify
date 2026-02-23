@@ -181,6 +181,7 @@ function updateStreakAndProgress(){
         const totalDays = data.habitSettings?.totalDays || 0;
         const doneDays = Array.isArray(data.completedDays) ? data.completedDays.length : 0;
         sessionData.dayProgressText = totalDays > 0 ? `${doneDays} / ${totalDays} days` : `${doneDays} days`;
+        const progressPercent = totalDays > 0 ? Math.min(100, (doneDays / totalDays) * 100) : 0;
 
         const completedStreakEl = document.getElementById('completeStreakNumber');
         if (completedStreakEl) {
@@ -190,6 +191,11 @@ function updateStreakAndProgress(){
         const completedProgressEl = document.getElementById('completeProgressText');
         if (completedProgressEl) {
             completedProgressEl.textContent = data.completedProgressText || sessionData.dayProgressText;
+        }
+
+        const completedProgressFill = document.getElementById('completeProgressFill');
+        if (completedProgressFill) {
+            completedProgressFill.style.width = `${progressPercent}%`;
         }
     })
 }
